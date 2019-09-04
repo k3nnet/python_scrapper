@@ -1,39 +1,37 @@
 import requests
 import bs4
+import json
 
 #request site page by passing in url and returning a html document
 def getPage():
-    URL="https://www.property24.com/apartments-to-rent/midrand/gauteng/16"
+    URL="https://classybrain.com/google-my-business-categories-2018/"
     raw_page_data=requests.get(URL)
     raw_page_data.raise_for_status()
     return raw_page_data;
    
 
+def toJson(data):
+    with open('data.json', 'w') as outfile:
+        json.dump(data, outfile)
+
 #scrape the site for property details
 def scrapeSite(site):
     content=[]
     property={}
-    properties=[]
+    categories=[]
     soup = bs4.BeautifulSoup(site.text,'html.parser')
-    content=soup.select('.p24_content')
+    content=soup.find_all('tbody')
     #print(content)
  
     for link in content:
-        print()
-        print()
-        print()
-        property['price']=link.select('.p24_price')[0].get_text().strip()
-        property['bedrooms']=link.select('span[title="Bedrooms"]>span')[0].get_text()
-        properties.append(property)
-    list_of_properties=(properties)
-
-    for property in list_of_properties:
-        print("price:",property.get('price'))
-        print("no Bedrooms:",property.get('bedrooms'))
-
-   
-    #print(list_of_properties)
-    return list_of_properties
+        
+        for linke in link.find_all('td'):
+                categories.append(linke.get_text())
+                print(categories)
+       
+    
+    return categories;
 
 if __name__ == "__main__":
-  scrapeSite(getPage())
+ data= scrapeSite(getPage())
+ toJson(data)
